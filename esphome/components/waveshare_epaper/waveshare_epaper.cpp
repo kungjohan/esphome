@@ -2167,7 +2167,25 @@ static const uint8_t PART_UPDATE_LUT_TTGO_DKE[LUT_SIZE_TTGO_DKE_PART] = {
     // 0x22,   0x17,   0x41,   0x0,    0x32,   0x32
 };
 
+
 void WaveshareEPaper2P13InDKE::initialize() {}
+
+void WaveshareEPaper2P13InDKE::ram_setup() {
+  this->command(0x44);
+  this->data(1);
+  this->data(this->get_width_internal() / 8);
+  this->command(0x45);
+  this->data(0);
+  this->data(0);
+  this->data(this->get_height_internal());
+  this->data(0);
+  this->command(0x4e);
+  this->data(1);
+  this->command(0x4f);
+  this->data(0);
+  this->data(0);
+}
+
 void HOT WaveshareEPaper2P13InDKE::display() {
   bool partial = this->at_update_ != 0;
   this->at_update_ = (this->at_update_ + 1) % this->full_update_every_;
@@ -2184,19 +2202,8 @@ void HOT WaveshareEPaper2P13InDKE::display() {
 
   this->command(0x11);
   this->data(0x03);
-  this->command(0x44);
-  this->data(1);
-  this->data(this->get_width_internal() / 8);
-  this->command(0x45);
-  this->data(0);
-  this->data(0);
-  this->data(this->get_height_internal());
-  this->data(0);
-  this->command(0x4e);
-  this->data(1);
-  this->command(0x4f);
-  this->data(0);
-  this->data(0);
+
+  this->ram_setup();
 
   if (!partial) {
     // send data
@@ -2284,5 +2291,27 @@ void WaveshareEPaper2P13InDKE::set_full_update_every(uint32_t full_update_every)
   this->full_update_every_ = full_update_every;
 }
 
+void WaveshareEPaper2P9InWeAct::ram_setup() {
+      // COMMAND SET RAM X ADDRESS START END POSITION
+      this->command(0x44);
+      this->data(0);
+      this->data((this->get_width_internal() - 1) / 8);
+
+      // COMMAND SET RAM Y ADDRESS START END POSITION
+      this->command(0x45);
+      this->data(0);
+      this->data(0);
+      this->data((this->get_height_internal() - 1) % 256);
+      this->data((this->get_height_internal() - 1) / 256);
+
+      // COMMAND SET RAM X ADDRESS COUNTER
+      this->command(0x4E);
+      this->data(0);
+
+      // COMMAND SET RAM Y ADDRESS COUNTER
+      this->command(0x4F);
+      this->data(0);
+      this->data(0);
+}
 }  // namespace waveshare_epaper
 }  // namespace esphome

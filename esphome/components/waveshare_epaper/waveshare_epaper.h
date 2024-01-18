@@ -604,6 +604,8 @@ class WaveshareEPaper2P13InDKE : public WaveshareEPaper {
   void set_full_update_every(uint32_t full_update_every);
 
  protected:
+  virtual void ram_setup();
+
   int get_width_internal() override;
 
   int get_height_internal() override;
@@ -614,5 +616,11 @@ class WaveshareEPaper2P13InDKE : public WaveshareEPaper {
   uint32_t at_update_{0};
 };
 
+class WaveshareEPaper2P9InWeAct : public WaveshareEPaper2P13InDKE {
+ protected:
+
+  int get_height_internal() override { return 296; }
+  void ram_setup() override;
+};
 }  // namespace waveshare_epaper
 }  // namespace esphome
